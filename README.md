@@ -1,121 +1,106 @@
-# Chamber-Master
-ESP32-based smart 3D printer enclosure controller with precise temperature regulation, adaptive vent/fan control using directional hysteresis, intake fault safety, adaptive cooldown mode, OLED menu with rotary encoder, and a responsive web dashboard for monitoring and control.
+                                                                              # Chamber-Master
+                                                                              ![chamber master](https://github.com/user-attachments/assets/a9cc9415-3845-4379-8462-13535d9cf75a)
 
 
-Key Features;-
+**ESP32-based smart 3D printer enclosure controller** with precise temperature regulation, adaptive vent/fan control using directional hysteresis, intake fault safety, adaptive cooldown mode, OLED menu with rotary encoder, and a responsive web dashboard for monitoring and control.
 
-Temperature Monitoring:-
+## Key Features
 
-Chamber: DS18B20 inside the enclosure
-Intake air: Second DS18B20 on the fresh air path (critical for fault detection)
-Ambient: DHT11 for room temperature & humidity
+### Temperature Monitoring
+- **Chamber**: DS18B20 placed inside the enclosure
+- **Intake air**: Second DS18B20 on the fresh air intake path (essential for fault detection)
+- **Ambient**: DHT11 (or DHT22) for room temperature and humidity
 
-Smart Vent Control:-
-SG90 micro servo with three precise states: Closed, Half-Open, Full-Open
-Advanced directional hysteresis logic for rock-solid temperature stability (no oscillating)
+### Smart Vent Control
+- SG90 micro servo with **three precise states**: Closed • Half-Open • Full-Open
+- Advanced **directional hysteresis logic** for rock-solid temperature stability (eliminates oscillation)
 
-Fan Control:-
-Standard 4-pin PC fan with full PWM and tachometer feedback (real RPM on display & web)
-Enforced minimum 20% duty during operation/cooldown to avoid sudden thermal shock
-Hard-kill transistor (2N2222) for true 0 RPM when off – no standby spin
+### Fan Control
+- Standard 4-pin PC fan with full PWM control and tachometer feedback (real RPM shown on OLED & web)
+- Enforced **minimum 20% duty** during operation and cooldown to prevent thermal shock
+- **Hard-kill transistor** (2N2222 + 1kΩ resistor) for true 0 RPM when off – no standby spin
 
-Operating Modes:-
-Material presets: PLA (30°C), ASA (50°C), ABS (60°C), TPU (25°C), PETG (40°C)
-Custom mode (0–120°C, saved persistently)
+### Operating Modes
+- **Material presets**:
+  - PLA → 30°C
+  - ASA → 50°C
+  - ABS → 60°C
+  - TPU → 25°C
+  - PETG → 40°C
+- **Custom mode**: Adjustable 0–120°C (saved persistently)
+- **Adaptive Cooldown Mode**:
+  - Starts at 20% fan speed + full vent open
+  - Automatically adjusts fan speed to achieve ≈1.5°C/min cooling rate
+  - Targets ambient temperature + 3°C
+  - Live progress bar + estimated time remaining on both OLED and web dashboard
 
-Adaptive Cooldown Mode:
-Starts at 20% fan + full vent open
-Auto-adjusts fan speed for ~1.5°C/min cooling
-Targets ambient + 3°C
-Live progress bar + estimated time remaining
+### Safety Features
+- **Intake fault detection**: Triggers emergency max fan + full vent if intake air > chamber +5°C (prevents hot air recirculation)
+- Automatic recovery when fault clears
 
-Safety Features:-
-Intake fault detection: Emergency max cooling if intake air > chamber +5°C (prevents hot air recirculation)
-Automatic recovery when cleared
+### User Interface
+- Crisp **SSD1306 128×64 OLED** display
+- Intuitive **rotary encoder** with push button for navigation
+- **Double-click** encoder button to safely exit active mode (closes vent, stops fan)
+- Blinking chamber temperature for quick visibility
+- QR code menu item for instant web dashboard access
 
-User Interface:-
-Crisp SSD1306 128x64 OLED
-Intuitive rotary encoder navigation + push button
-Double-click to exit active mode (safely closes vent & stops fan)
-Blinking chamber temp for quick glance
-QR code menu item for instant web access
+### Web Dashboard
+- Sleek **dark glassmorphism** design with live 1-second updates
+- Displays all sensors, fan RPM/%, vent state, current mode & target
+- Animated spinning fan icon
+- Cooldown progress ring + estimated time
+- Flashing red banner during intake faults
+- One-click button to start cooldown
+- Built-in iframe for live printer camera (e.g., `http://3d-print-live.local` – basic ESP32-CAM sketch coming soon)
+- Accessible via mDNS: **http://enclosure-monitor.local**
 
-Web Dashboard
-Sleek dark glass morphism design with live updates
-All sensors, fan RPM/%, vent state, mode, target
-Animated spinning fan icon
-Cooldown progress ring + time estimate
-Flashing red banner on faults
-One-click cooldown start
-Built-in iframe for your printer cam (e.g., http://3d-print-live.local) [a basic esp32cam sketch will be uploaded soon]
-mDNS access: http://enclosure-monitor.local
+### Extras
+- Persistent settings (last selected mode & custom target) using NVS
+- Startup servo calibration routine for reliable homing and positioning
+- Built-in LED (GPIO 2) indicates active cooling
+- Planned: 3D-printable mounts and cases (STL files coming soon)
 
-Extras:-
-Persistent settings (last mode & custom target)
-Startup servo calibration for perfect positioning and homing
-Built-in LED shows active cooling"(pin2)
-3D Models for 3D printing mounts
+## Hardware Requirements
 
-Hardware Requirements:-
-Components
-Recommended / Notes
-ESP32 dev board-Any (e.g., ESP32-WROOM-32)
-SSD1306 128x64 OLED-I2C, 0x3C address
-2× DS18B20 sensors modules (optional 2.2Kohms resister on VCC and DATA for signal Filtering on long wire Setups)
-Waterproof versions ideal for enclosure
-DHT11 (or DHT22)-Ambient temp/humidity
-Rotary encoder + button-Standard KY-040 style or Any
-SG90 micro servo-Continious Rotation-For vent articulation
-120mm 4-pin PC fan-PWM + tachometer
-2N2222 transistor + 1kΩ resistor-Hard-kill low-side switch on fan GND
-Power supplies from printer or discrete your choice-5V for logic/servo; 12V for fan if needed
+| Component                          | Recommended / Notes                                                                 |
+|------------------------------------|-------------------------------------------------------------------------------------|
+| ESP32 development board            | Any standard board (e.g., ESP32-WROOM-32)                                           |
+| SSD1306 128×64 OLED display        | I2C interface, address 0x3C                                                         |
+| 2× DS18B20 temperature sensors     | Waterproof recommended; optional 2.2kΩ pull-up resistor for long cable runs         |
+| DHT11 or DHT22                     | For ambient temperature & humidity (DHT22 more accurate)                            |
+| Rotary encoder with button         | Standard KY-040 or equivalent                                                       |
+| SG90 micro servo                   | Standard rotation (not continuous) – for vent flap actuation                        |
+| 120mm 4-pin PC fan                 | Must support PWM control + tachometer output                                        |
+| 2N2222 transistor + 1kΩ resistor   | Low-side hard-kill switch on fan ground line                                        |
+| Power supply                       | 5V for ESP32/servo/sensors; 12V for fan (can be sourced from printer PSU)           |
 
-Pinout (as coded – easily changeable):Servo: 5 • Fan PWM: 33 • Fan Tach: 19 • Fan Power Kill: 15
-Chamber DS18B20: 32 • Intake DS18B20: 13 • DHT: 23
-Encoder: 25/26/27 • OLED: I2C (default SDA/SCL)
+### Default Pinout (easily changeable in code)
+- Servo: **GPIO 5**
+- Fan PWM: **GPIO 33**
+- Fan Tachometer: **GPIO 19**
+- Fan Power Kill: **GPIO 15**
+- Chamber DS18B20: **GPIO 32**
+- Intake DS18B20: **GPIO 13**
+- DHT11/22: **GPIO 23**
+- Encoder CLK/DT/SW: **GPIO 25 / 26 / 27**
+- OLED: Standard I2C (SDA = GPIO 21, SCL = GPIO 22 on most boards)
 
-Setup & Installation:-
+## Setup & Installation
 
-Libraries:-
+### Required Libraries (Arduino IDE → Library Manager)
+- Adafruit SSD1306
+- Adafruit GFX
+- OneWire
+- DallasTemperature
+- DHT sensor library (by Adafruit)
+- ESP32Encoder
+- ESP32Servo
+- QRCodeGFX
 
-(Arduino IDE → Library Manager):Adafruit SSD1306 & GFX
-OneWire
-DallasTemperature
-DHT sensor library
-ESP32Encoder
-ESP32Servo
-QRCodeGFX
+### Upload Instructions
+1. Open `Chamber-Master.ino` in Arduino IDE
+2. Edit WiFi credentials:
 
-Upload:
-Open the .ino file
-Fill in your WiFi credentials
-Select ESP32 board & upload
-
-First Run:
-Servo runs a quick calibration cycle
-Use encoder to pick a mode → press to activate
-
-Web dashboard:
-http://enclosure-monitor.local
-
-
-Pro Tips for Best Results
-Place the intake DS18B20 right at the fresh air entry or near printer motherboard vents.
-Fine-tune servo timings in code to match your printed vent mechanism.
-Use a -2000 RPM fan for near-silent operation and best performance.
-For ABS/ASA, combine with a good enclosure (IKEA Lack, Prusa, or custom).
-The cooldown algorithm works best with decent airflow—add intake holes if needed.
-
-Contributing:-
-Love it? Help make it better!
-Report bugs or suggest features via Issues
-PRs welcome: new UI tweaks, more material presets, schematics, 3D models for mounts/cases
-
-Share your builds!
-
-
-
-
-LicenseMIT License – free to use, modify, and share.Happy printing! Version 1.1 • December 19, 2025
-
-
+   const char *ssid = "YOUR_SSID";
+   const char *password = "YOUR_PASSWORD";
