@@ -1,3 +1,11 @@
+<div align="center">
+
+# **Chamber-Master**
+
+**ESP32-based smart 3D printer enclosure controller**
+
+</div>
+
 ![chamber master](https://github.com/user-attachments/assets/1aa07578-f1d4-4f93-a6e0-61c9c6e856b4)
 
 
