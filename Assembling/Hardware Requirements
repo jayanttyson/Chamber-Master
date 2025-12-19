@@ -9,22 +9,22 @@ Here is the complete list of hardware needed to build the project:
   I2C interface, address 0x3C (most common modules)
 
 - **DS18B20 temperature sensor** – 2  
-  Waterproof versions strongly recommended (one for chamber, one for intake)
+   (one for chamber, one for intake) can use waterproof versions
 
 - **Pull-up resistor (4.7kΩ)** – 1  
-  For DS18B20 OneWire bus (can be shared between both sensors)
+  For DS18B20 OneWire bus (can be shared between both sensors) not needed if using a module
 
 - **DHT11 or DHT22 sensor** – 1  
   For ambient temperature & humidity (DHT22 is more accurate)
 
 - **Pull-up resistor (10kΩ)** – 1  
-  Recommended for DHT11/22 data pin
+  Recommended for DHT11/22 data pin not needed if using a module
 
 - **Rotary encoder with push button** – 1  
   Standard KY-040 module or equivalent
 
 - **SG90 micro servo** – 1  
-  Standard rotation (not continuous) – for driving the vent mechanism
+  Continuous rotation (Can use standard but will need code modifications) – for driving the vent mechanism
 
 - **120mm 4-pin PC fan** – 1  
   Must have PWM control (blue wire) and tachometer output (yellow wire)
