@@ -21,3 +21,4 @@ Update your main Chamber-Master code with your measured values.
 This method works perfectly for continuous rotation servos where angle control doesn't apply — everything is time-based! 
 
 you can try dephault values in the code already if that work for you 
+you can also use grok AI is is super usefull for esp coding
