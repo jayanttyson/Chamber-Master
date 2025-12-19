@@ -111,3 +111,31 @@
 
    const char *ssid = "YOUR_SSID";
    const char *password = "YOUR_PASSWORD";
+3. Select your ESP32 board and correct port
+4. Upload the sketch
+
+## First Boot
+Servo performs a full calibration cycle (open → close → open → close) for accurate homing
+Use rotary encoder to browse modes → press to activate
+Access web dashboard at http://enclosure-monitor.local
+
+## Pro Tips for Best ResultsPlace the intake DS18B20 directly at the fresh air entry point or near printer motherboard exhaust vents for early recirculation detection
+- Fine-tune servo timing constants (SERVO_OPEN_TIME, etc.) to perfectly match your 3D-printed vent mechanism
+- Choose a high-quality ≥2000 RPM fan (e.g., Noctua or Arctic) for silent yet powerful airflow
+- For ABS/ASA printing, pair with a well-sealed enclosure (IKEA Lack, Prusa enclosure, or custom build)
+- Ensure adequate passive intake holes – the cooldown algorithm performs best with good natural airflow
+
+## Contributing
+Love the project? Help make it even better!Open issues for bugs, questions, or feature requests
+Submit pull requests: UI improvements, new material presets, wiring schematics, 3D models, etc.
+- Share your builds and modifications in the Discussions or Issues
+
+## LicenseMIT License – completely free to use, modify, share, and distribute.
+
+## Happy printing!
+
+
+
+
+
+   
