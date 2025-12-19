@@ -21,6 +21,7 @@
 ### Smart Vent Control
 - SG90 micro servo with **three precise states**: Closed • Half-Open • Full-Open
 - Advanced **directional hysteresis logic** for rock-solid temperature stability (eliminates oscillation)
+- Use servo tuning code to tune your servo if default values dont work for you
 
 ### Fan Control
 - Standard 4-pin PC fan with full PWM control and tachometer feedback (real RPM shown on OLED & web)
@@ -129,6 +130,7 @@ Access web dashboard at http://enclosure-monitor.local
 Love the project? Help make it even better!Open issues for bugs, questions, or feature requests
 Submit pull requests: UI improvements, new material presets, wiring schematics, 3D models, etc.
 - Share your builds and modifications in the Discussions or Issues
+- you can use Grok AI to make your own changes , it works very well , free version works fine
 
 ## LicenseMIT License – completely free to use, modify, share, and distribute.
 
