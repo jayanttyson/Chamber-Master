@@ -1,0 +1,23 @@
+How to Tune Your Continuous Rotation ServoUpload the sketch above.
+Open Serial Monitor (115200 baud, line ending: Newline).
+First goal: Find true STOP pulseSend +10 and -10 slowly around 1500
+Watch/listen until the servo completely stops moving
+Note that exact value (e.g., 1492 µs) → this becomes SERVO_STOP_PULSE
+
+Determine directions:From stop value, send +20 → see which way it turns
+Send -20 → opposite direction
+Decide which direction opens the vent → that’s SERVO_REVERSE_PULSE
+Opposite → SERVO_FORWARD_PULSE (closing)
+
+Time-based movement:Set a moderate speed pulse (e.g., 1600)
+Use time 2000 → runs for 2 seconds then stops
+Measure how far the vent moves
+Repeat with different times to find:Time needed for full open
+Time for half open
+Time for full close
+
+Update your main Chamber-Master code with your measured values.
+
+This method works perfectly for continuous rotation servos where angle control doesn't apply — everything is time-based! 
+
+you can try dephault values in the code already if that work for you 
