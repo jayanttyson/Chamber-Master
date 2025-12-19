@@ -1,0 +1,40 @@
+### Pin Connections – Chamber-Master (ESP32)
+
+Here is a clean, easy-to-read list of all ESP32 GPIO connections for the project:
+
+**I2C Display**
+- **GPIO 21** → OLED SDA
+- **GPIO 22** → OLED SCL
+
+**Rotary Encoder**
+- **GPIO 25** → Encoder CLK
+- **GPIO 26** → Encoder DT
+- **GPIO 27** → Encoder SW (push button)
+
+**Temperature Sensors**
+- **GPIO 32** → Chamber DS18B20 (Data)
+- **GPIO 13** → Intake DS18B20 (Data)
+
+**Ambient Sensor**
+- **GPIO 23** → DHT11/DHT22 (Data)
+
+**Servo**
+- **GPIO 5**  → SG90 Servo signal (Orange wire)
+
+**Fan Control**
+- **GPIO 33** → Fan PWM (Blue wire)
+- **GPIO 19** → Fan Tachometer/RPM (Yellow wire)
+- **GPIO 15** → Fan hard-kill (via 1kΩ resistor → base of 2N2222 transistor)
+
+**Status Indicator**
+- **GPIO 2**  → Built-in/onboard LED (active cooling indicator)
+
+**Power**
+- **VIN / 5V** → +5V supply (for ESP32, servo, sensors, OLED)
+- **GND**     → Common ground (all components + fan ground via transistor)
+
+**Notes**
+- DS18B20 sensors share a single 4.7kΩ pull-up resistor (Data → 5V)
+- DHT sensor: 10kΩ pull-up recommended (often built into module)
+- Fan +12V comes directly from power supply (red wire)
+- Fan GND (black wire) is routed through the 2N2222 collector for true power cut-off
