@@ -1,50 +1,62 @@
-Here is a clear, text-only list of all connections for easy reference when building the project.ESP32 to ComponentsChamber Temperature Sensor (DS18B20)
+Here is a clear, text-only list of all connections for easy reference when building the project.
+ESP32 to Components
+Chamber Temperature Sensor (DS18B20)
 Data pin → GPIO 32
 VCC → 5V
 GND → GND
 (4.7kΩ pull-up resistor between Data and 5V recommended)
+
 Intake Temperature Sensor (DS18B20)
 Data pin → GPIO 13
 VCC → 5V
 GND → GND
 (Same 4.7kΩ pull-up can be shared with chamber sensor)
+
 Ambient Sensor (DHT11 or DHT22)
 Data pin → GPIO 23
 VCC → 5V
 GND → GND
 (10kΩ pull-up on data pin recommended for DHT11)
+
 Rotary Encoder (KY-040 or similar)
 CLK → GPIO 25
 DT  → GPIO 26
 SW  → GPIO 27 (internal pull-up used in code)
 VCC → 5V or 3.3V (depending on module)
 GND → GND
+
 SG90 Servo (for vent)
 Signal (Orange/Yellow) → GPIO 5
 VCC (Red) → 5V
 GND (Brown/Black) → GND
+
 120mm PC Fan
 PWM control (Blue) → GPIO 33
 Tachometer/RPM (Yellow) → GPIO 19
 +12V (Red) → +12V from power supply
 GND (Black) → Collector of 2N2222 transistor (see below)
+
 Fan Hard-Kill Circuit (True 0 RPM)
 GPIO 15 → 1kΩ resistor → Base of 2N2222 transistor
 Emitter of 2N2222 → GND
 Collector of 2N2222 → Fan GND wire (Black)
 (This cuts power completely when fan is off)
+
 SSD1306 OLED Display (128×64, I2C)
 SDA → GPIO 21 (default I2C SDA on most ESP32 boards)
 SCL → GPIO 22 (default I2C SCL)
 VCC → 3.3V or 5V (check your module)
 GND → GND
+
 Status LED
 Built-in LED on GPIO 2 (indicates active cooling) – no external wiring needed
 
-Power NotesUse a stable 5V supply for ESP32, sensors, servo, and OLED.
+Power Notes
+Use a stable 5V supply for ESP32, sensors, servo, and OLED.
 Fan typically requires 12V – connect directly from printer PSU or separate 12V supply.
 All GND pins must be connected together (common ground).
 4.7kOhms resister on temp Sensors not need if using a module , they are inbuilt
 
-This list matches the default pinout in the code. You can change any GPIO in the sketch if needed.
+This list matches the default pinout in the code.
+You can change any GPIO in the sketch if needed.
 
