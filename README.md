@@ -78,7 +78,7 @@
 | 2× DS18B20 temperature sensors     | Waterproof recommended; optional 2.2kΩ pull-up resistor for long cable runs         |
 | DHT11 or DHT22                     | For ambient temperature & humidity (DHT22 more accurate)                            |
 | Rotary encoder with button         | Standard KY-040 or equivalent                                                       |
-| SG90 micro servo                   | Standard rotation (not continuous) – for vent flap actuation                        |
+| SG90 micro servo                   | Continuous rotation (can be coded for standard servos) – for vent actuation         |
 | 120mm 4-pin PC fan                 | Must support PWM control + tachometer output                                        |
 | 2N2222 transistor + 1kΩ resistor   | Low-side hard-kill switch on fan ground line                                        |
 | Power supply                       | 5V for ESP32/servo/sensors; 12V for fan (can be sourced from printer PSU)           |
