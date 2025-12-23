@@ -27,9 +27,6 @@
  * - SG90 or similar servo for vent control
  * - 4-pin PC fan (PWM + tachometer)
  * - 2N2222 transistor + 1kΩ resistor for low-side hard kill on fan GND
- * 
- * Author: [Your Name]
- * Version: 1.1
  * Date: December 19, 2025
  * License: MIT License (feel free to modify and share)
  */
