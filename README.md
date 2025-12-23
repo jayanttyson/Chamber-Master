@@ -8,7 +8,10 @@
 
 ![chamber master](https://github.com/user-attachments/assets/1aa07578-f1d4-4f93-a6e0-61c9c6e856b4)
 
-[![Watch the video](https://img.youtube.com/vi/ktXHP1pz5N8/maxresdefault.jpg)](https://www.youtube.com/watch?v=ktXHP1pz5N8)
+## 🎥 Watch the Demo
+
+[![Watch the video](https://img.youtube.com/vi/ktXHP1pz5N8/0.jpg)](https://www.youtube.com/watch?v=ktXHP1pz5N8)
+
 
 
 
