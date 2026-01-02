@@ -21,7 +21,7 @@
 
 ### Temperature Monitoring
 - **Chamber**: DS18B20 placed inside the enclosure
-- **Intake air**: Second DS18B20 on the fresh air intake path (essential for fault detection)
+- **Intake air**: Second DS18B20 on the printer's motherboard vent or fresh air intake path (essential for fault detection)
 - **Ambient**: DHT11 (or DHT22) for room temperature and humidity
 
 ### Smart Vent Control
@@ -66,14 +66,14 @@
 - Cooldown progress ring + estimated time
 - Flashing red banner during intake faults
 - One-click button to start cooldown
-- Built-in iframe for live printer camera (e.g., `http://3d-print-live.local` – basic ESP32-CAM sketch coming soon)
+- Built-in iframe for live printer camera (e.g., `http://3d-print-live.local` – basic ESP32-CAM sketch Provided with flash button and a Quality selector dropdown menu with snapshot button)
 - Accessible via mDNS: **http://enclosure-monitor.local**
 
 ### Extras
 - Persistent settings (last selected mode & custom target) using NVS
 - Startup servo calibration routine for reliable homing and positioning
 - Built-in LED (GPIO 2) indicates active cooling
-- Planned: 3D-printable mounts and cases (STL files coming soon)
+- Planned: 3D-printable mounts and cases 
 
 ## Hardware Requirements
 
@@ -81,13 +81,17 @@
 |------------------------------------|-------------------------------------------------------------------------------------|
 | ESP32 development board            | Any standard board (e.g., ESP32-WROOM-32)                                           |
 | SSD1306 128×64 OLED display        | I2C interface, address 0x3C                                                         |
-| 2× DS18B20 temperature sensors     | Waterproof recommended; optional 2.2kΩ pull-up resistor for long cable runs         |
-| DHT11 or DHT22                     | For ambient temperature & humidity (DHT22 more accurate)                            |
+| 2× DS18B20 temperature sensors     | optional 2.2kΩ pull-up resistor for long cable runs                                 |
+| DHT11 or DHT22                     | For ambient temperature & humidity (DHT22 more accurate but not neccesary)          |
 | Rotary encoder with button         | Standard KY-040 or equivalent                                                       |
 | SG90 micro servo                   | Continuous rotation (can be coded for standard servos) – for vent actuation         |
 | 120mm 4-pin PC fan                 | Must support PWM control + tachometer output                                        |
 | 2N2222 transistor + 1kΩ resistor   | Low-side hard-kill switch on fan ground line                                        |
 | Power supply                       | 5V for ESP32/servo/sensors; 12V for fan (can be sourced from printer PSU)           |
+
+You can use your own vent design to work with this code too , just need to turn the servo timmings to your vent style or just use the provided one
+Use any grease of your choice on the gear and rotating flaps in the aperature vent for better movement (Recommeded)
+Dont use PLA or any other filament which deform in warm chamber `60C
 
 ### Default Pinout (easily changeable in code)
 - Servo: **GPIO 5**
@@ -102,6 +106,60 @@
 
 ## Setup & Installation
 
+## Adding ESP Boards to Arduino IDE (ESP32 / ESP8266)
+
+### Requirements
+- Arduino IDE (v1.8.x or v2.x)
+- Internet connection
+
+---
+
+### Step 1: Add Board Manager URLs
+1. Open **Arduino IDE**
+2. Go to **File → Preferences**
+3. In **Additional Boards Manager URLs**, paste: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+4. Click **OK**
+
+---
+
+### Step 2: Install ESP Boards
+1. Go to **Tools → Board → Boards Manager**
+2. Search and install:
+   - **esp32** (by Espressif Systems)
+   - **esp8266** (by ESP8266 Community)
+
+---
+
+### Step 3: Select Your Board
+Go to **Tools → Board** and select your board, for example:
+- ESP32 Dev Module
+- ESP32 WROOM 32
+- NodeMCU 1.0 (ESP8266)
+- Generic ESP8266 Module
+
+---
+
+### Step 4: Select Port
+1. Connect the ESP board via USB
+2. Go to **Tools → Port**
+3. Select the COM port that appears
+
+---
+
+### Step 5: USB Driver (If Port Not Visible)
+Install the correct USB driver for your board:
+- **CH340**
+- **CP2102**
+- **FTDI**
+
+After installation, restart Arduino IDE.
+
+---
+
+✅ Your ESP board is now ready to be programmed using Arduino IDE.
+
+
+
 ### Required Libraries (Arduino IDE → Library Manager)
 - Adafruit SSD1306
 - Adafruit GFX
@@ -113,7 +171,10 @@
 - QRCodeGFX
 
 ### Upload Instructions
-1. Open `Chamber-Master.ino` in Arduino IDE
+
+Download the latest build from releases
+
+1. Open `<Rev.x.x>.ino` in Arduino IDE
 2. Edit WiFi credentials:
 
    const char *ssid = "YOUR_SSID";
@@ -126,8 +187,9 @@ Servo performs a full calibration cycle (open → close → open → close) for 
 Use rotary encoder to browse modes → press to activate
 Access web dashboard at http://enclosure-monitor.local
 
-## Pro Tips for Best ResultsPlace the intake DS18B20 directly at the fresh air entry point or near printer motherboard exhaust vents for early recirculation detection
-- Fine-tune servo timing constants (SERVO_OPEN_TIME, etc.) to perfectly match your 3D-printed vent mechanism
+## Pro Tips for Best Results
+Place the intake DS18B20 directly at the fresh air entry point or near printer motherboard exhaust vents for early recirculation detection
+- Fine-tune servo timing constants (SERVO_OPEN_TIME, etc.) to perfectly match your 3D-printed vent mechanism (if needed)
 - Choose a high-quality ≥2000 RPM fan (e.g., Noctua or Arctic) for silent yet powerful airflow
 - For ABS/ASA printing, pair with a well-sealed enclosure (IKEA Lack, Prusa enclosure, or custom build)
 - Ensure adequate passive intake holes – the cooldown algorithm performs best with good natural airflow
@@ -138,7 +200,23 @@ Submit pull requests: UI improvements, new material presets, wiring schematics, 
 - Share your builds and modifications in the Discussions or Issues
 - you can use Grok AI to make your own changes , it works very well , free version works fine
 
-## LicenseMIT License – completely free to use, modify, share, and distribute.
+## License
+MIT License
+
+Copyright (c) 2026 JB
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND...
+
 
 ## Happy printing!
 
