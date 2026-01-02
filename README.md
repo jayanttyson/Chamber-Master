@@ -6,13 +6,14 @@
 
 </div>
 
+<div align="center">
 ![chamber master](https://github.com/user-attachments/assets/1aa07578-f1d4-4f93-a6e0-61c9c6e856b4)
 
 ## 🎥 Watch the Demo
 
 [![Watch the video](https://img.youtube.com/vi/ktXHP1pz5N8/0.jpg)](https://www.youtube.com/watch?v=ktXHP1pz5N8)
 
-
+</div>
 
 
 **ESP32-based smart 3D printer enclosure controller** with precise temperature regulation, adaptive vent/fan control using directional hysteresis, intake fault safety, adaptive cooldown mode, OLED menu with rotary encoder, and a responsive web dashboard for monitoring and control.
@@ -20,11 +21,13 @@
 ## Key Features
 
 ### Temperature Monitoring
+![temp](https://github.com/user-attachments/assets/471e7b9d-16c5-4621-9443-8cb17a5fd830)
 - **Chamber**: DS18B20 placed inside the enclosure
 - **Intake air**: Second DS18B20 on the printer's motherboard vent or fresh air intake path (essential for fault detection)
 - **Ambient**: DHT11 (or DHT22) for room temperature and humidity
 
 ### Smart Vent Control
+![vent](https://github.com/user-attachments/assets/e6650e52-f200-4bac-ad4d-a0612e5d8f0b)
 - SG90 micro servo with **three precise states**: Closed • Half-Open • Full-Open
 - Advanced **directional hysteresis logic** for rock-solid temperature stability (eliminates oscillation)
 - Use servo tuning code to tune your servo if default values dont work for you
@@ -53,7 +56,7 @@
 - Automatic recovery when fault clears
 
 ### User Interface
-
+![oled menu](https://github.com/user-attachments/assets/79ddc128-01dc-4299-95bf-ec3f79ad745c)
 - Crisp **SSD1306 128×64 OLED** display
 - Intuitive **rotary encoder** with push button for navigation
 - **Double-click** encoder button to safely exit active mode (closes vent, stops fan)
@@ -62,7 +65,6 @@
 
 ### Web Dashboard
 ![webpage gif](https://github.com/user-attachments/assets/7d7d6779-34f5-4f4d-867a-c52affe4427c)
-
 - Sleek **dark glassmorphism** design with live 1-second updates
 - Displays all sensors, fan RPM/%, vent state, current mode & target
 - Animated spinning fan icon
