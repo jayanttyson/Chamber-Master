@@ -7,7 +7,8 @@
 </div>
 
 <div align="center">
-![chamber master](https://github.com/user-attachments/assets/1aa07578-f1d4-4f93-a6e0-61c9c6e856b4)
+<img width="3872" height="1984" alt="image_2026-01-02_232209933" src="https://github.com/user-attachments/assets/fdeca6c7-7432-427c-bc56-d5b119a349c6" />
+
 
 ## 🎥 Watch the Demo
 
