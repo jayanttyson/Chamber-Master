@@ -53,6 +53,7 @@
 - Automatic recovery when fault clears
 
 ### User Interface
+
 - Crisp **SSD1306 128×64 OLED** display
 - Intuitive **rotary encoder** with push button for navigation
 - **Double-click** encoder button to safely exit active mode (closes vent, stops fan)
@@ -60,6 +61,8 @@
 - QR code menu item for instant web dashboard access
 
 ### Web Dashboard
+![webpage gif](https://github.com/user-attachments/assets/7d7d6779-34f5-4f4d-867a-c52affe4427c)
+
 - Sleek **dark glassmorphism** design with live 1-second updates
 - Displays all sensors, fan RPM/%, vent state, current mode & target
 - Animated spinning fan icon
@@ -203,7 +206,7 @@ Submit pull requests: UI improvements, new material presets, wiring schematics, 
 ## License
 MIT License
 
-Copyright (c) 2026 JB
+Copyright (c) 2026 Jayant Bhatia
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
