@@ -1,7 +1,7 @@
 # Product Requirement & Specification Document (product.md)
 
 ## Project Overview
-**Product Name:** 3D Printer Enclosure Controller  
+**Product Name:** Chamber Master (3D Printer Enclosure Controller)  
 **Version:** 2.5 (Production-Grade Enhanced)  
 **Author:** Jayant Bhatia  
 **License:** MIT License  

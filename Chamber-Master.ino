@@ -1,5 +1,5 @@
 /*
- * 3D Printer Enclosure Controller - Version 2.5 (Single File Production Sketch)
+ * Chamber Master - 3D Printer Enclosure Controller - Version 2.5 (Single File Production Sketch)
  * 
  * Hardware Rationale (Why Hard Kill Transistor is Needed):
  * Standard 4-pin PC cooling fans adhere to the Intel 4-Wire PWM Fan Specification.

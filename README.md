@@ -1,4 +1,4 @@
-# 3D Printer Enclosure Controller (v2.5)
+# Chamber Master (v2.5) — 3D Printer Enclosure Controller
 
 An ESP32-powered environmental controller for 3D printer enclosures featuring multi-zone thermal sensing, automated vent shutter control, 4-pin PC fan PWM control with low-side hard kill zero-RPM cut-off, adaptive material cooldown routines, intake fault safety alerts, an OLED display UI, and a responsive Web Dashboard with mDNS support (`http://enclosure-monitor.local`).
 
