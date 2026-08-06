@@ -1,0 +1,87 @@
+### How Chamber-Master Works – Operation, Logic, Hysteresis & Safety
+
+#### Overview of Operation
+Chamber-Master is a smart active temperature controller for 3D printer enclosures.  
+It maintains a stable chamber temperature for better print quality with materials like ABS/ASA, and provides a gentle **adaptive cooldown** after printing to prevent warping.
+
+The system uses:
+- Two DS18B20 sensors: one inside the chamber, one on the fresh air intake path
+- A servo-controlled vent (iris-style recommended)
+- A 120mm PC fan with PWM and RPM feedback
+- Directional hysteresis logic for stable control without oscillation
+
+#### Normal Operating Modes (Material Presets & Custom)
+Each mode has a target temperature (e.g., PLA: 30°C, ABS: 60°C, Custom: user-set).
+
+**Smart Directional Hysteresis Logic** (prevents hunting/oscillation):
+The vent has **three states**:  
+- **Closed** → No cooling  
+- **Half-Open** → Moderate cooling (low fan)  
+- **Full-Open** → Maximum cooling (high fan)
+
+Control rules (based on chamber temp vs. target):
+
+- **From Closed**:
+  - If chamber > target **-1°C** → Open to **Half-Open** + Low fan (20–55%)
+  - If chamber > target **+2°C** → Jump directly to **Full-Open** + High fan (100%)
+
+- **From Half-Open** (stable zone):
+  - If chamber drops below target **-2°C** → Close vent + Fan off
+  - If chamber rises above target **+2°C** → Go to **Full-Open** + High fan
+
+- **From Full-Open**:
+  - Only drop back to **Half-Open** + Low fan when chamber ≤ target **+1°C**
+
+This directional design creates natural "dead bands" and prevents rapid cycling between states.
+
+**Fan Behavior in Normal Modes**:
+- Minimum duty cycle: **20%** whenever fan is on (prevents sudden cold air shock)
+- Hard-kill transistor cuts power completely when fan should be fully off (true 0 RPM, no standby spin)
+
+#### Adaptive Cooldown Mode
+Activated manually (OLED menu or web dashboard button) after a print finishes.
+
+**Goal**: Cool the chamber safely and efficiently to near ambient temperature without thermal shock.
+
+**How it works**:
+- Immediately: Full vent open + fan starts at **20%**
+- Every 60 seconds:
+  - Measures cooling rate over the past minute
+  - Adjusts fan speed up/down by 8% (20–100%) to maintain ≈ **1.5°C per minute**
+  - Never drops below 20%
+- Target: Ambient temperature + **3°C** (safe final temp)
+- Displays on OLED & web:
+  - Progress bar (based on temperature drop remaining)
+  - Estimated time remaining (calculated from recent cooling rate)
+
+When chamber reaches target, fan stops and vent closes.
+
+#### Safety Features
+
+1. **Intake Fault Detection** (critical for recirculated hot air)
+   - Continuously compares intake sensor vs. chamber sensor
+   - If intake air > chamber + **5°C** → **Emergency mode**:
+     - Full vent open
+     - Fan to 100%
+     - OLED shows "INTAKE FAULT!"
+     - Web dashboard shows flashing red banner
+   - Recovers automatically when intake ≤ chamber + **2°C**
+
+2. **Hard Fan Kill**
+   - 2N2222 transistor on fan ground line
+   - When duty <20%, power is completely cut → true 0 RPM (no bearing wear, silent)
+
+3. **Startup Servo Calibration**
+   - On first boot: Servo cycles full open → close → open → close
+   - Ensures accurate positioning before normal operation
+
+4. **Minimum Fan Duty**
+   - Never runs fan below 20% during active cooling → avoids sudden temperature drops that can crack prints
+
+#### User Interaction Summary
+- **Rotary encoder**: Rotate to navigate menu → Press to select mode
+- **Double-click** encoder button: Exit active mode → safely closes vent & stops fan
+- **QR code menu item**: Quick access to web dashboard
+- **Web dashboard**: Live stats, manual cooldown start, fault alerts
+
+This combination of precise hysteresis, adaptive cooling, and robust safety makes Chamber-Master reliable for everyday use with warping-prone filaments.

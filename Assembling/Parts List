@@ -1,0 +1,47 @@
+### Basic Parts List for Chamber-Master
+
+Here is a simple, beginner-friendly shopping list with only the essential components needed to build the project.
+
+- **ESP32 development board** × 1  
+  (e.g., ESP32 DevKitC or any ESP32-WROOM module)
+
+- **SSD1306 128×64 OLED display (I2C)** × 1
+
+- **DS18B20 waterproof temperature sensor** × 2  
+  (One for inside the enclosure, one for intake air)
+
+- **4.7kΩ resistor** × 1  
+  (Pull-up for DS18B20 sensors)
+
+- **DHT11 or DHT22 temperature/humidity sensor** × 1  
+  (DHT22 recommended for better accuracy)
+
+- **10kΩ resistor** × 1  
+  (Pull-up for DHT sensor – often already on the module)
+
+- **Rotary encoder module with button** × 1  
+  (KY-040 or similar)
+
+- **SG90 micro servo** × 1
+
+- **120mm 4-pin PC fan** × 1  
+  (Must have PWM and tachometer wires)
+
+- **2N2222 transistor (or any small NPN like BC547)** × 1
+
+- **1kΩ resistor** × 1  
+  (For transistor base)
+
+- **Jumper wires (male-female & male-male)** – assorted pack
+
+- **Breadboard (or perfboard for permanent build)** × 1
+
+- **Power supply**  
+  – 5V USB or 5V/2A+ adapter (for ESP32, servo, sensors)  
+  – 12V source for fan (optional – can use printer's PSU)
+
+**Optional (but highly recommended)**
+- 3D-printed iris vent mechanism  
+  (https://www.printables.com/model/533875-servo-automated-iris-aperture-for-120-mm-fan)
+
+This is the minimal set to get a fully working Chamber-Master controller. Start with a breadboard setup, then move to a permanent soldered version once tested!

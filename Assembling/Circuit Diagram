@@ -1,0 +1,51 @@
+                          +5V
+                           |
+                           |
+                  +--------+--------+
+                  |                 |
+                  |   ESP32          |
+                  |                 |
+GPIO32 -------->  | CHAMBER DS18B20  |  (OneWire)
+GPIO13 -------->  | INTAKE  DS18B20  |  (OneWire)
+GPIO23 -------->  | DHT11/DHT22      |  Data pin
+                  |                 |
+GPIO25 -------->  | Rotary Encoder   |  CLK
+GPIO26 -------->  |                  |  DT
+GPIO27 <-------- |                  |  SW (pull-up)
+                  |                 |
+GPIO5  -------->  | SG90 Servo       |  Signal (Orange)
+                  |                 |
+GPIO33 -------->  | Fan PWM          |  Blue wire (control)
+GPIO19 <-------- | Fan Tach         |  Yellow wire (RPM)
+GPIO15 -------->  | Fan Power Kill   |  → Base of 2N2222
+                  |                 |
+GPIO21 -------->  | OLED SSD1306     |  SDA (I2C)
+GPIO22 -------->  |                  |  SCL (I2C)
+GPIO2  -------->  | Built-in LED     |
+                  +--------+--------+
+                           |
+                           |
+                  +--------+--------+
+                  |                 |
+                  |   120mm PC Fan   |
+                  |   +12V  --- Red  |
+                  |   GND   --- Black (cut & insert transistor)
+                  |   PWM   <--- GPIO33
+                  |   Tach  ---> GPIO19
+                  +--------+--------+
+                           |
+                  Collector ---- GND (from PSU)
+                           |
+                        2N2222
+                  Emitter ─────┘
+                           |
+                        1kΩ Resistor
+                           |
+                        GPIO15 (Fan Power Kill)
+
+Notes:
+- DS18B20: 4.7kΩ pull-up resistor between Data and +5V (shared bus possible)
+- DHT11/22: 10kΩ pull-up on data pin recommended
+- Servo: Brown → GND, Red → +5V, Orange → GPIO5
+- Fan GND line is interrupted by 2N2222 (low-side switch) for hard-kill
+- All grounds connected together
