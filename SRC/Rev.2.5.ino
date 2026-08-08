@@ -492,6 +492,14 @@ void updateFan(FanSpeed s) {
     fanSpeed = s;
     uint8_t duty = (s == FAN_HIGH) ? 255 : (s == FAN_LOW) ? 140 : 0;
     setFanDuty(duty, (s == FAN_OFF));  // True 0 Hard Kill when OFF
+  } else if (s == FAN_OFF) {
+    // Safety: ALWAYS enforce hard kill when OFF is requested, even if fanSpeed
+    // is already FAN_OFF. Cooldown mode calls setFanDuty() directly which sets
+    // FAN_POWER_PIN HIGH without updating fanSpeed, causing desync. This
+    // guarantees the transistor cuts GND regardless of cached state.
+    digitalWrite(FAN_POWER_PIN, LOW);
+    fanPWM.writeScaled(0.0f);
+    fanDutyCycle = 0;
   }
 }
 // =================================================================
@@ -1143,6 +1151,8 @@ void loop() {
         } else if (chamberTemp > activeTarget + HYSTERESIS_TO_HALF) {
           startOpenVent(true);
           updateFan(FAN_LOW);
+        } else {
+          updateFan(FAN_OFF);  // Enforce hard kill when below target
         }
       } else if (ventState == VENT_HALF_OPEN || ventState == VENT_HALF_OPENING) {
         if (chamberTemp < activeTarget + HYSTERESIS_TO_CLOSED) {
