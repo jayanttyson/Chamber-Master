@@ -116,7 +116,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 // ========================================================
 
 // ==================== FAN PWM CONFIGURATION ====================
-const int FAN_PWM_FREQ = 1000;
+const int FAN_PWM_FREQ = 25000; // 25 kHz - Official Intel 4-Wire PWM Fan Spec
 const int FAN_PWM_RES  = 8;
 volatile uint8_t fanDutyCycle = 0;
 ESP32PWM fanPWM;
@@ -496,15 +496,32 @@ void updateLED() {
 }
 // ======================================================
 
-// ==================== FAN CONTROL WITH HARD KILL ====================
+// ==================== FAN CONTROL WITH HARD KILL & PARASITIC ISOLATION ====================
 void setFanDuty(uint8_t d, bool allowBelow20 = false) {
   fanDutyCycle = d;
 
   if (allowBelow20 && d < NORMAL_MIN_DUTY) {
-    digitalWrite(FAN_POWER_PIN, LOW); // Transistor cuts GND rail to override 4-pin CPU fan failsafe
-    fanPWM.writeScaled(0.0f);
+    // Hard Kill: Cut GND rail via transistor
+    digitalWrite(FAN_POWER_PIN, LOW);
+    
+    // Eliminate Parasitic Grounding:
+    // Detach PWM pin and set to INPUT (High-Z) so current cannot sink through GPIO 33
+    fanPWM.detachPin(FAN_PIN);
+    pinMode(FAN_PIN, INPUT);
+    
+    // Disable Tachometer internal pull-up so current cannot sink/leak through GPIO 19
+    pinMode(FAN_TACH_PIN, INPUT);
+    
+    fanDutyCycle = 0;
   } else {
-    digitalWrite(FAN_POWER_PIN, HIGH); // Ground rail engaged
+    // Ground rail engaged
+    digitalWrite(FAN_POWER_PIN, HIGH);
+    
+    // Restore Tachometer pull-up & PWM pin output
+    pinMode(FAN_TACH_PIN, INPUT_PULLUP);
+    pinMode(FAN_PIN, OUTPUT);
+    fanPWM.attachPin(FAN_PIN, FAN_PWM_FREQ, FAN_PWM_RES);
+    
     uint8_t effectiveDuty = allowBelow20 ? d : max(d, NORMAL_MIN_DUTY);
     fanPWM.writeScaled(effectiveDuty / 255.0f);
   }
@@ -513,19 +530,9 @@ void setFanDuty(uint8_t d, bool allowBelow20 = false) {
 }
 
 void updateFan(FanSpeed s) {
-  if (s != fanSpeed) {
-    fanSpeed = s;
-    uint8_t duty = (s == FAN_HIGH) ? 255 : (s == FAN_LOW) ? 140 : 0;
-    setFanDuty(duty, (s == FAN_OFF));  // True 0 Hard Kill when OFF
-  } else if (s == FAN_OFF) {
-    // Safety: ALWAYS enforce hard kill when OFF is requested, even if fanSpeed
-    // is already FAN_OFF. Cooldown mode calls setFanDuty() directly which sets
-    // FAN_POWER_PIN HIGH without updating fanSpeed, causing desync. This
-    // guarantees the transistor cuts GND regardless of cached state.
-    digitalWrite(FAN_POWER_PIN, LOW);
-    fanPWM.writeScaled(0.0f);
-    fanDutyCycle = 0;
-  }
+  fanSpeed = s;
+  uint8_t duty = (s == FAN_HIGH) ? 255 : (s == FAN_LOW) ? 140 : 0;
+  setFanDuty(duty, (s == FAN_OFF));
 }
 // =================================================================
 
@@ -931,13 +938,9 @@ void setup() {
   lastEncoderCount = encoder.getCount();
 
   pinMode(FAN_POWER_PIN, OUTPUT);
-  digitalWrite(FAN_POWER_PIN, LOW); // Hard kill inactive initially
-
-  pinMode(FAN_PIN, OUTPUT);
-  fanPWM.attachPin(FAN_PIN, FAN_PWM_FREQ, FAN_PWM_RES);
-  fanPWM.writeScaled(0.0f);
   pinMode(FAN_TACH_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(FAN_TACH_PIN), fanPulseISR, FALLING);
+  setFanDuty(0, true); // Engage hard kill & High-Z parasitic isolation initially
 
   ventServo.attach(SERVO_PIN, 500, 2500);
   ventServo.setPeriodHertz(50);
