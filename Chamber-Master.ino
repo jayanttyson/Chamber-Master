@@ -454,36 +454,48 @@ void updateLED() {
 // ======================================================
 
 // ==================== FAN CONTROL WITH HARD KILL & PARASITIC ISOLATION ====================
+bool fanHardKilled = true; // Tracks whether fan hardware is in hard-kill (OFF) or active (ON) state
+
 void setFanDuty(uint8_t d, bool allowBelow20 = false) {
   fanDutyCycle = d;
 
   if (allowBelow20 && d < NORMAL_MIN_DUTY) {
-    // 1. Hard Kill: Cut GND rail via transistor
-    digitalWrite(FAN_POWER_PIN, LOW);
-    
-    // 2. Eliminate Parasitic Grounding & Diode Conduction:
-    // Detach PWM pin and drive HIGH (3.3V) so zero voltage differential exists across PWM wire/diode
-    fanPWM.detachPin(FAN_PIN);
-    pinMode(FAN_PIN, OUTPUT);
-    digitalWrite(FAN_PIN, HIGH);
-    
-    // 3. Disable Tachometer internal pull-up & interrupt so current cannot sink/leak through GPIO 19
-    detachInterrupt(digitalPinToInterrupt(FAN_TACH_PIN));
-    pinMode(FAN_TACH_PIN, INPUT);
-    
+    // Only reconfigure hardware on transition from ON → OFF
+    if (!fanHardKilled) {
+      // 1. Hard Kill: Cut GND rail via transistor
+      digitalWrite(FAN_POWER_PIN, LOW);
+      
+      // 2. Eliminate Parasitic Grounding & Diode Conduction:
+      // Detach PWM pin and drive HIGH (3.3V) so zero voltage differential exists across PWM wire/diode
+      fanPWM.detachPin(FAN_PIN);
+      pinMode(FAN_PIN, OUTPUT);
+      digitalWrite(FAN_PIN, HIGH);
+      
+      // 3. Disable Tachometer internal pull-up & interrupt so current cannot sink/leak through GPIO 19
+      detachInterrupt(digitalPinToInterrupt(FAN_TACH_PIN));
+      pinMode(FAN_TACH_PIN, INPUT);
+      
+      fanHardKilled = true;
+    }
     fanDutyCycle = 0;
   } else {
-    // 1. Ground rail engaged
-    digitalWrite(FAN_POWER_PIN, HIGH);
+    // Only reconfigure hardware on transition from OFF → ON
+    if (fanHardKilled) {
+      // 1. Ground rail engaged
+      digitalWrite(FAN_POWER_PIN, HIGH);
+      
+      // 2. Restore Tachometer pull-up & pulse ISR
+      pinMode(FAN_TACH_PIN, INPUT_PULLUP);
+      attachInterrupt(digitalPinToInterrupt(FAN_TACH_PIN), fanPulseISR, FALLING);
+      
+      // 3. Restore PWM pin output & 25kHz PWM timer
+      pinMode(FAN_PIN, OUTPUT);
+      fanPWM.attachPin(FAN_PIN, FAN_PWM_FREQ, FAN_PWM_RES);
+      
+      fanHardKilled = false;
+    }
     
-    // 2. Restore Tachometer pull-up & pulse ISR
-    pinMode(FAN_TACH_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(FAN_TACH_PIN), fanPulseISR, FALLING);
-    
-    // 3. Restore PWM pin output & 25kHz PWM timer
-    pinMode(FAN_PIN, OUTPUT);
-    fanPWM.attachPin(FAN_PIN, FAN_PWM_FREQ, FAN_PWM_RES);
-    
+    // Always update duty cycle (speed changes don't need hardware reconfiguration)
     uint8_t effectiveDuty = allowBelow20 ? d : max(d, NORMAL_MIN_DUTY);
     fanPWM.writeScaled(effectiveDuty / 255.0f);
   }
