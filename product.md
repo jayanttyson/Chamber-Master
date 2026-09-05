@@ -2,11 +2,11 @@
 
 ## Project Overview
 **Product Name:** Chamber Master (3D Printer Enclosure Controller)  
-**Version:** 2.5 (Production-Grade Enhanced)  
+**Version:** 2.9-beta (Klipper Integration)  
 **Author:** Jayant Bhatia  
 **License:** MIT License  
 
-The **3D Printer Enclosure Controller** is an intelligent, embedded ESP32 system designed for monitoring and controlling environmental conditions within a 3D printer enclosure. It provides real-time thermal monitoring across multiple zones, automated servo-driven ventilation control, dynamic 4-pin PC fan PWM management with low-side hard kill zero-RPM control, adaptive material cooldown routines (ABS/ASA thermal stress prevention), intake fault safety protection, rotary encoder UI with OLED display, and a modern responsive web dashboard accessible via mDNS (`http://enclosure-monitor.local`).
+The **3D Printer Enclosure Controller** is an intelligent, embedded ESP32 system designed for monitoring and controlling environmental conditions within a 3D printer enclosure. It provides real-time thermal monitoring across multiple zones, automated servo-driven ventilation control, dynamic 4-pin PC fan PWM management with low-side hard kill zero-RPM control, adaptive material cooldown routines (ABS/ASA thermal stress prevention), intake fault safety protection, rotary encoder UI with OLED display, a modern responsive web dashboard accessible via mDNS (`http://enclosure-monitor.local`), and native REST API integration with Klipper 3D printer firmware.
 
 ---
 
@@ -70,6 +70,7 @@ chamber master/
 | 8 | **Improvement** | Unknown web routes return proper 404 via `server.onNotFound()` |
 | 9 | **Improvement** | Vent opens before fan engages in cooldown to prevent back-pressure noise |
 | 10 | **Cleanup** | Removed unnecessary `(int)` cast on `ambientHum` assignment (`roundf()` instead) |
+| 11 | **Feature (v2.9-beta)** | REST API `/material` endpoint for Klipper 3D printer firmware & slicer integration (contributed / proposed by [@richard-kennett](https://github.com/richard-kennett)) |
 
 ---
 
@@ -125,3 +126,22 @@ Standard 4-pin PC cooling fans adhere to the **Intel 4-Wire PWM Fan Specificatio
   }
   ```
 - **POST `/start_cooldown`**: Initiates adaptive cooldown mode from web interface.
+- **GET / POST `/material`**: Sets active material preset mode or custom temperature from Klipper / slicer macros.
+  - **Parameters:**
+    - `material` *(string, required)*: Material mode name (`PLA`, `ASA`, `ABS`, `TPU`, `PETG`, `CUSTOM`, `COOLDOWN`). Case-insensitive.
+    - `temperature` or `temp` *(float, optional)*: Target chamber temperature in °C (0.0 to 120.0). Applied and saved to NVS when `material=CUSTOM`.
+  - **Success Response (200 OK):**
+    ```json
+    {
+      "status": "OK",
+      "mode": "PLA",
+      "targetTemp": 30.0
+    }
+    ```
+  - **Error Response (400 Bad Request):**
+    ```json
+    {
+      "error": "Missing 'material' parameter"
+    }
+    ```
+

@@ -1,6 +1,6 @@
 <div align="center">
 
-# **Chamber Master (v2.5)**
+# **Chamber Master (v2.9-beta)**
 
 **ESP32-based Smart 3D Printer Enclosure Controller**
 
@@ -101,6 +101,58 @@ The project supports both single-file Arduino IDE workflows and PlatformIO multi
 - **PlatformIO / VS Code (Modular Build):**
   - `include/`: Header declarations (`config.h`, `sensors.h`, `actuators.h`, `cooldown.h`, `ui_display.h`, `web_dashboard.h`).
   - `src/`: C++ module implementations (`main.cpp`, `config.cpp`, `sensors.cpp`, `actuators.cpp`, `cooldown.cpp`, `ui_display.cpp`, `web_dashboard.cpp`).
+
+---
+
+## 🖨️ Klipper Integration & Macros (v2.9-beta)
+
+> *Note: Klipper integration and macro concept proposed by [Richard Kennett](https://github.com/richard-kennett) ([Issue #3](https://github.com/jayanttyson/Chamber-Master/issues/3)).*
+
+Chamber Master exposes a REST API endpoint (`/material`) allowing Klipper 3D printer firmware to automatically configure the enclosure target temperature and material profile directly from filament start G-code or slicer profiles.
+
+### 1. Klipper Macro Configuration
+Add the following shell commands and macros to your `printer.cfg` (requires `gcode_shell_command`):
+
+```ini
+[gcode_shell_command chamber_set_material]
+command: sh -c 'curl -s "http://enclosure-monitor.local/material?material=$0&temperature=$1"'
+timeout: 3.0
+verbose: False
+
+[gcode_macro SET_CHAMBER_MATERIAL]
+description: Set Chamber Master material mode and optional target temperature
+gcode:
+    {% set material = params.MATERIAL|default("PLA")|string %}
+    {% set temperature = params.TEMPERATURE|default(0)|float %}
+    RUN_SHELL_COMMAND CMD=chamber_set_material PARAMS="{material} {temperature}"
+
+[gcode_shell_command chamber_start_cooldown]
+command: curl -s -X POST "http://enclosure-monitor.local/start_cooldown"
+timeout: 3.0
+verbose: False
+
+[gcode_macro START_CHAMBER_COOLDOWN]
+description: Trigger Chamber Master adaptive cooldown routine
+gcode:
+    RUN_SHELL_COMMAND CMD=chamber_start_cooldown
+```
+
+### 2. Slicer Filament Start G-Code Examples
+In OrcaSlicer, PrusaSlicer, or Bambu Studio, add to your **Filament Start G-Code**:
+```gcode
+; Automate enclosure temperature for active filament
+SET_CHAMBER_MATERIAL MATERIAL=[filament_type]
+```
+For custom chamber temperatures:
+```gcode
+SET_CHAMBER_MATERIAL MATERIAL=CUSTOM TEMPERATURE=55
+```
+
+### 3. Print End Cooldown
+In your **Machine End G-Code**, automatically trigger the cooldown routine:
+```gcode
+START_CHAMBER_COOLDOWN
+```
 
 ---
 
