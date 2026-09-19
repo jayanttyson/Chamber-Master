@@ -145,3 +145,21 @@ Standard 4-pin PC cooling fans adhere to the **Intel 4-Wire PWM Fan Specificatio
     }
     ```
 
+---
+
+## Klipper Integration Architecture (v2.9-beta)
+
+> **Physical Hardware Validation:** Verified and contributed by [Richard Kennett](https://github.com/richard-kennett) ([Issue #3](https://github.com/jayanttyson/Chamber-Master/issues/3#issuecomment-5619889047)).
+
+1. **Host Prerequisites:**
+   - Linux Klipper host requires mDNS name resolution installed (`sudo apt install -y mdns avahi-daemon`).
+2. **Fast IPv4 Resolution Script (`chamber_trigger.sh`):**
+   - Resolves `enclosure-monitor.local` via `ping -4 -c 1 ${URL}` to populate and read the local IP directly, preventing curl DNS resolution timeouts in Klipper subshells.
+   - Dispatches curl call to `/material` endpoint with material and optional temperature parameters.
+3. **Klipper Macros (`chamber_master.cfg`):**
+   - `[gcode_macro Chamber_Master]`: Stores `variable_url: "enclosure-monitor.local"`.
+   - `[gcode_shell_command chamber_curl]`: Invokes `bash $HOME/chamber_trigger.sh` with a 4.0s timeout.
+   - `[gcode_macro SET_CHAMBER]`: Normalizes material to uppercase and passes target temperature if specified.
+   - `[gcode_macro START_CHAMBER_COOLDOWN]`: Dispatches `SET_CHAMBER MATERIAL=COOLDOWN` for automated post-print cooling.
+
+

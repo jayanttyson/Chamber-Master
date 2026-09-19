@@ -106,50 +106,77 @@ The project supports both single-file Arduino IDE workflows and PlatformIO multi
 
 ## 🖨️ Klipper Integration & Macros (v2.9-beta)
 
-> *Note: Klipper integration and macro concept proposed by [Richard Kennett](https://github.com/richard-kennett) ([Issue #3](https://github.com/jayanttyson/Chamber-Master/issues/3)).*
+> *Hardware Tested & Verified: Klipper integration and macros proposed and verified on physical hardware by [Richard Kennett](https://github.com/richard-kennett) ([Issue #3](https://github.com/jayanttyson/Chamber-Master/issues/3#issuecomment-5619889047)).*
 
-Chamber Master exposes a REST API endpoint (`/material`) allowing Klipper 3D printer firmware to automatically configure the enclosure target temperature and material profile directly from filament start G-code or slicer profiles.
+Chamber Master exposes a REST API endpoint (`/material`) allowing Klipper 3D printer firmware to automatically configure enclosure target temperatures and material profiles directly from filament start G-code or slicer profiles. Complete ready-to-use configuration files are located in the [`Klipper/`](Klipper/) directory.
 
-### 1. Klipper Macro Configuration
-Add the following shell commands and macros to your `printer.cfg` (requires `gcode_shell_command`):
+### 1. Prerequisites on Klipper Host
+Install mDNS resolution support on your Klipper host (Raspberry Pi / Linux):
+```bash
+sudo apt update && sudo apt install -y mdns avahi-daemon
+```
+
+### 2. Install Host Trigger Script
+Copy [`Klipper/chamber_trigger.sh`](Klipper/chamber_trigger.sh) to your home directory (`$HOME`):
+```bash
+cp Klipper/chamber_trigger.sh ~/chamber_trigger.sh
+chmod +x ~/chamber_trigger.sh
+```
+*Note: The script performs an IPv4 ping lookup (`ping -4 -c 1`) to cache and grab the controller's IP immediately, preventing curl DNS resolution timeouts in Klipper subshells.*
+
+### 3. Klipper Macro Configuration
+Add the tested macros below to your `printer.cfg` (or add `[include chamber_master.cfg]` using [`Klipper/chamber_master.cfg`](Klipper/chamber_master.cfg)):
 
 ```ini
-[gcode_shell_command chamber_set_material]
-command: sh -c 'curl -s "http://enclosure-monitor.local/material?material=$0&temperature=$1"'
-timeout: 3.0
-verbose: False
+[gcode_macro Chamber_Master]
+description: Configuration variables for Chamber Master
+variable_url: "enclosure-monitor.local"   # Matches mDNS hostname on OLED screen
+gcode:
 
-[gcode_macro SET_CHAMBER_MATERIAL]
+[gcode_shell_command chamber_curl]
+command: bash $HOME/chamber_trigger.sh
+timeout: 4.0
+verbose: True
+
+[gcode_macro SET_CHAMBER]
 description: Set Chamber Master material mode and optional target temperature
 gcode:
-    {% set material = params.MATERIAL|default("PLA")|string %}
-    {% set temperature = params.TEMPERATURE|default(0)|float %}
-    RUN_SHELL_COMMAND CMD=chamber_set_material PARAMS="{material} {temperature}"
+    {% set cf = printer.configfile.settings %}
+    {% set url = cf['gcode_macro chamber_master'].variable_url %}
 
-[gcode_shell_command chamber_start_cooldown]
-command: curl -s -X POST "http://enclosure-monitor.local/start_cooldown"
-timeout: 3.0
-verbose: False
+    # 1. Read material and force it to UPPERCASE
+    {% set material = params.MATERIAL|default("XXX")|string|upper %}
+    {% if material == "" %}
+        {% set material = "XXX" %}
+    {% endif %}
+
+    # 2. Check if temperature was explicitly passed
+    {% if 'TEMPERATURE' in params %}
+        {% set temperature = params.TEMPERATURE|int %}
+        RUN_SHELL_COMMAND CMD=chamber_curl PARAMS="{url} {material} {temperature}"
+    {% else %}
+        RUN_SHELL_COMMAND CMD=chamber_curl PARAMS="{url} {material}"
+    {% endif %}
 
 [gcode_macro START_CHAMBER_COOLDOWN]
 description: Trigger Chamber Master adaptive cooldown routine
 gcode:
-    RUN_SHELL_COMMAND CMD=chamber_start_cooldown
+    SET_CHAMBER MATERIAL=COOLDOWN
 ```
 
-### 2. Slicer Filament Start G-Code Examples
+### 4. Slicer Filament Start G-Code Examples
 In OrcaSlicer, PrusaSlicer, or Bambu Studio, add to your **Filament Start G-Code**:
 ```gcode
 ; Automate enclosure temperature for active filament
-SET_CHAMBER_MATERIAL MATERIAL=[filament_type]
+SET_CHAMBER MATERIAL=[filament_type]
 ```
 For custom chamber temperatures:
 ```gcode
-SET_CHAMBER_MATERIAL MATERIAL=CUSTOM TEMPERATURE=55
+SET_CHAMBER MATERIAL=CUSTOM TEMPERATURE=55
 ```
 
-### 3. Print End Cooldown
-In your **Machine End G-Code**, automatically trigger the cooldown routine:
+### 5. Print End Cooldown
+In your **Machine End G-Code** or `PRINT_END` macro:
 ```gcode
 START_CHAMBER_COOLDOWN
 ```
